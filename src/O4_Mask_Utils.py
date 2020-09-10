@@ -511,10 +511,11 @@ if __name__ == '__main__':
     if epsg_code!='4326':
         name+='_'+epsg_code
         print("Changing coordinates to match EPSG code")
-        from pyproj import Transformer
+        import pyproj
         import shapely.ops
-        transformer = Transformer.from_crs("epsg:4326", "epsg:"+ epsg_code, always_xy=True)
-        reprojection = lambda x, y: transformer.transform(x, y)
+        s_proj=pyproj.Proj(init='epsg:4326')
+        t_proj=pyproj.Proj(init='epsg:'+epsg_code)
+        reprojection = lambda x, y: pyproj.transform(s_proj, t_proj, x, y)
         multipolygon_area=shapely.ops.transform(reprojection,multipolygon_area)
 
     vector_map.encode_MultiPolygon(multipolygon_area,VECT.dummy_alt,'WATER',check=True,cut=False)
